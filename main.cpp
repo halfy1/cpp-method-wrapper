@@ -43,50 +43,61 @@ struct Calculator {
 int main() {
     Calculator calc;
     Engine engine;
-
+    
     std::cout << std::fixed << std::setprecision(2);
+    
+    engine.register_command(
+        make_wrapper(&calc, &Calculator::add<int, int>, {{"arg1", 0}, {"arg2", 0}}),
+        "add"
+    );
+    Value r1 = engine.execute("add", {{"arg1", 10}, {"arg2", 20}});
+    std::cout << "add(10, 20) = " << std::get<int>(r1) << std::endl;
+    
+    Value r2 = engine.execute("add", {{"arg2", 30}, {"arg1", 15}});
+    std::cout << "add(arg2=30, arg1=15) = " << std::get<int>(r2) << std::endl;
+    
+    Value r3 = engine.execute("add", {{"arg1", 100}});
+    std::cout << "add(100, default=0) = " << std::get<int>(r3) << std::endl;
+    
+    Value r4 = engine.execute("add", {});
+    std::cout << "add(default=0, default=0) = " << std::get<int>(r4) << std::endl << std::endl;
+    
 
-    engine.register_command(make_wrapper(&calc, &Calculator::add<int, int>), "add2");
-    Value r2 = engine.execute("add2", {{"arg1", 10}, {"arg2", 20}});
-    std::cout << "add(10, 20) = " << std::get<int>(r2) << std::endl;
+    engine.register_command(
+        make_wrapper(&calc, &Calculator::multiply<int, int>, {{"x", 1}, {"y", 1}}),
+        "mul"
+    );
+    Value m1 = engine.execute("mul", {{"x", 5}, {"y", 6}});
+    std::cout << "multiply(x=5, y=6) = " << std::get<int>(m1) << std::endl;
+    
+    Value m2 = engine.execute("mul", {{"y", 10}});
+    std::cout << "multiply(x=default=1, y=10) = " << std::get<int>(m2) << std::endl << std::endl;
+    
 
-    engine.register_command(make_wrapper(&calc, &Calculator::add<int, int, int>), "add3");
-    Value r3 = engine.execute("add3", {{"arg1", 10}, {"arg2", -20}, {"arg3", 30}});
-    std::cout << "add(10, -20, 30) = " << std::get<int>(r3) << std::endl;
+    engine.register_command(
+        make_wrapper(&calc, &Calculator::add<int, int, int>, 
+                    {{"first", 0}, {"second", 0}, {"third", 0}}),
+        "add3"
+    );
+    Value a1 = engine.execute("add3", {{"first", 10}, {"second", 20}, {"third", 30}});
+    std::cout << "add(10, 20, 30) = " << std::get<int>(a1) << std::endl;
+    
+    Value a2 = engine.execute("add3", {{"third", 5}, {"first", 1}, {"second", 2}});
+    std::cout << "add(first=1, second=2, third=5) = " << std::get<int>(a2) << std::endl;
+    
+    Value a3 = engine.execute("add3", {{"first", 100}, {"third", 50}});
+    std::cout << "add(100, default=0, 50) = " << std::get<int>(a3) << std::endl << std::endl;
+    
 
-    engine.register_command(make_wrapper(&calc, &Calculator::add<int, int, int, int, int>), "add5");
-    Value r5 = engine.execute("add5", {
-        {"arg1", 1}, {"arg2", 2}, {"arg3", 3}, {"arg4", 4}, {"arg5", 5}
-    });
-    std::cout << "add(1, 2, 3, 4, 5) = " << std::get<int>(r5) << std::endl;
-
-    engine.register_command(make_wrapper(&calc, &Calculator::multiply<int, int>), "mul2");
-    Value m2 = engine.execute("mul2", {{"arg1", 5}, {"arg2", 6}});
-    std::cout << "multiply(5, 6) = " << std::get<int>(m2) << std::endl;
-
-    engine.register_command(make_wrapper(&calc, &Calculator::multiply<int, int, int>), "mul3");
-    Value m3 = engine.execute("mul3", {{"arg1", 2}, {"arg2", 3}, {"arg3", 4}});
-    std::cout << "multiply(2, 3, 4) = " << std::get<int>(m3) << std::endl;
-
-    engine.register_command(make_wrapper(&calc, &Calculator::subtract<int, int>), "sub2");
-    Value s2 = engine.execute("sub2", {{"arg1", 100}, {"arg2", 30}});
-    std::cout << "subtract(100, 30) = " << std::get<int>(s2) << std::endl;
-
-    engine.register_command(make_wrapper(&calc, &Calculator::subtract<int, int, int>), "sub3");
-    Value s3 = engine.execute("sub3", {{"arg1", 100}, {"arg2", 20}, {"arg3", 30}});
-    std::cout << "subtract(100, 20, 30) = " << std::get<int>(s3) << std::endl;
-
-    engine.register_command(make_wrapper(&calc, &Calculator::average<int, int, int>), "avg3");
-    Value avg = engine.execute("avg3", {{"arg1", 80}, {"arg2", 90}, {"arg3", 100}});
-    std::cout << "average(80, 90, 100) = " << std::get<double>(avg) << std::endl;
-
-    engine.register_command(make_wrapper(&calc, &Calculator::divide), "div");
-    Value div_result = engine.execute("div", {{"arg1", 22.0}, {"arg2", 7.0}});
-    std::cout << "divide(22, 7) = " << std::get<double>(div_result) << std::endl;
-
-    engine.register_command(make_wrapper(&calc, &Calculator::power), "pow");
-    Value pow_result = engine.execute("pow", {{"arg1", 2}, {"arg2", 10}});
-    std::cout << "power(2, 10) = " << std::get<int>(pow_result) << std::endl;
-
+    engine.register_command(
+        make_wrapper(&calc, &Calculator::divide, {{"dividend", 1.0}, {"divisor", 1.0}}),
+        "div"
+    );
+    Value d1 = engine.execute("div", {{"dividend", 22.0}, {"divisor", 7.0}});
+    std::cout << "divide(22, 7) = " << std::get<double>(d1) << std::endl;
+    
+    Value d2 = engine.execute("div", {{"divisor", 2.0}});
+    std::cout << "divide(default=1.0, 2.0) = " << std::get<double>(d2) << std::endl;
+    
     return 0;
 }
