@@ -39,3 +39,7 @@
 
 # debug information files
 *.dwo
+
+*.vscode
+test_wrapper
+wrapper_demo
