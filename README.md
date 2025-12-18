@@ -11,13 +11,10 @@ sudo apt install libgtest-dev
 ## Быстрый старт
 
 ```bash
-make
-
-make test
-
-make run
-
-make check
+cmake -S . -B build
+cmake --build build
+./build/wrapper_demo
+./build/test_wrapper
 ```
 
 ## Основные компоненты
